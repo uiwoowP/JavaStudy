@@ -10,6 +10,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,23 +29,31 @@ import database.DBConnector;
 
 public class Order_B1 extends JFrame {
 	
+	// 폰트 설정 TextField, 사이즈 설정
 	boolean isClientExist = false;
 	static Font font = new Font("나눔글꼴", Font.PLAIN, 14);
-	boolean isShow = false;
+	boolean isShow = true;
+	
+	JTextField name, qty, cId;
+	
 	DBConnector connector = new DBConnector("HR", "1234");
 	Dimension textField = new Dimension(200, 35);
 	
-	JTextField name, qty, cId;
+	// 날짜설정 필요도구 불러오기
+	Date today = new Date();
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 	
 	Order_B1() {
 		 setTitle("Order_B1");
 		 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		 setLayout(new GridBagLayout());
 		 
+		 // 뒤로가기 버튼
 		 JButton backButton = new JButton("뒤로가기");
 		 backButton.setFont(font);
 		 backButton.setSize(new Dimension(80, 40));
 		 
+		 // 상단 라벨
 		 JLabel head = new JLabel("발주신청");
 		 JPanel headPanel = new JPanel();
 		 
@@ -53,14 +64,15 @@ public class Order_B1 extends JFrame {
 		 headPanel.setPreferredSize(textField);
 		 headPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 		 
+		 
+		 // 날짜 표시
 		 JButton date = new JButton();
 		 date.setPreferredSize(new Dimension(200, 35));
 		 date.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-		 Date today = new Date();
-		 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		 date.setText(dateFormat.format(today));
 		 date.setFont(new Font("나눔글꼴", Font.PLAIN, 15));
 		 
+		 // 이름 수량 업체코드 TextField 설정
 		 name = new JTextField();
 		 name.setPreferredSize(textField);
 		 name.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
@@ -71,6 +83,7 @@ public class Order_B1 extends JFrame {
 		 cId.setPreferredSize(textField);
 		 cId.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 		 
+		 // TextField 라벨 설정
 		 JLabel nameLabel = new JLabel("상품명");
 		 nameLabel.setFont(font);
 		 JLabel qtyLabel = new JLabel("수량");
@@ -78,6 +91,7 @@ public class Order_B1 extends JFrame {
 		 JLabel cIdLabel = new JLabel("업체코드");
 		 cIdLabel.setFont(font);
 		 
+		 // 신청하기 버튼
 		 JButton submit = new JButton("신청하기");
 		 submit.setFont(font);
 		 submit.setSize(80, 40);
@@ -85,7 +99,11 @@ public class Order_B1 extends JFrame {
 			 
 			 @Override
 			 public void actionPerformed(ActionEvent e) {
-
+				 
+				 // 데이터 삽입 메서드
+				 insertData();
+				 
+				 // 데이터 삽입 완료후 클라이언트 ID가 존재여부에 따라 다른 알림창 출력
 				if (isClientExist) {
 					JDialog dialog = new JDialog(Order_B1.this, "알림", true);
 					dialog.setSize(200, 150);
@@ -113,6 +131,7 @@ public class Order_B1 extends JFrame {
 					dialog.add(buttonPanel, BorderLayout.SOUTH);
 
 					dialog.setVisible(true);
+					
 					} else {
 						JDialog dialog = new JDialog(Order_B1.this, "알림", true);
 						dialog.setSize(200, 150);
@@ -138,13 +157,14 @@ public class Order_B1 extends JFrame {
 						JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 						buttonPanel.add(okButton);
 						dialog.add(buttonPanel, BorderLayout.SOUTH);
-
+						
 						dialog.setVisible(true);
 						
 					}
 				}
 			});
 		 
+		 	// 레이아웃에 컴포넌트 배치
 	        GridBagConstraints gbc = new GridBagConstraints();
 	        gbc.weightx = 0.5;
 	        gbc.weighty = 0.5;
@@ -192,16 +212,38 @@ public class Order_B1 extends JFrame {
 	        add(submit, gbc);
 
 	        setSize(450, 800);
-	        setVisible(true);
-
+	        setVisible(isShow);
 	}
 	
+	// 데이터 삽입 메서드
 	private void insertData() {
-		String name = name.getText();
+		String nameStr = name.getText();
+		String dateStr = dateFormat.format(today);
 		String qtyStr = qty.getText();
 		String cIdStr = cId.getText();
 		
+		String sql = "INSERT INTO order_item(order_seq, item_name, order_date, qty, client_id)"
+				+ " VALUES(order_seq.nextval, ?, ?, ?, ?)";
+		
+		try (
+				Connection conn = connector.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				) {
+			pstmt.setString(1, nameStr);
+			pstmt.setString(2, dateStr);
+			pstmt.setString(3, qtyStr);
+			pstmt.setString(4, cIdStr);
+			
+			int row = pstmt.executeUpdate();
+			System.out.printf("%d행 업데이트 되었습니다.", row);
+			isClientExist = true;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			isClientExist = false;
+		}
 	}
+
 	
 	public static void main(String[] args) {
 		new Order_B1();
