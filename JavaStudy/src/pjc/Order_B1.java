@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -46,7 +47,7 @@ public class Order_B1 extends JFrame {
 	Order_B1() {
 		 setTitle("Order_B1");
 		 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		 setLayout(new GridBagLayout());
+		 setLayout(null);
 		 
 		 // 뒤로가기 버튼
 		 JButton backButton = new JButton("뒤로가기");
@@ -63,6 +64,12 @@ public class Order_B1 extends JFrame {
 		 headPanel.setAlignmentY(CENTER_ALIGNMENT);
 		 headPanel.setPreferredSize(textField);
 		 headPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		 
+		 JLabel imageLabel = new JLabel();
+		 imageLabel.setIcon(new ImageIcon("ikea_bg.png"));
+		 JPanel imagePanel = new JPanel();
+		 imagePanel.setSize(new Dimension(450, 300));
+		 imagePanel.add(imageLabel);
 		 
 		 
 		 // 날짜 표시
@@ -210,7 +217,8 @@ public class Order_B1 extends JFrame {
 	        gbc.anchor = GridBagConstraints.PAGE_START;
 	        gbc.insets = new Insets(400, 0, 0, 0);
 	        add(submit, gbc);
-
+	        
+	        
 	        setSize(450, 800);
 	        setVisible(isShow);
 	}
