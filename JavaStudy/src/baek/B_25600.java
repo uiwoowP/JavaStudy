@@ -26,7 +26,6 @@ public class B_25600 {
 			} else {
 				temp = a * (d + g);				
 			}
-			
 			if (score < temp) {
 				score = temp;
 			}
