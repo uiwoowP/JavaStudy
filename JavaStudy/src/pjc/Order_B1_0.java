@@ -2,7 +2,6 @@ package pjc;
 
 import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,7 +10,6 @@ import javax.swing.JPanel;
 public class Order_B1_0 extends JFrame {
 	
 	boolean isShow = true;
-	
 	
 	public Order_B1_0() {
 		setTitle("Order_B1");
